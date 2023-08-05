@@ -27,6 +27,7 @@ main>button {
   text-transform: uppercase;
   padding: 5px;
   border-radius: 20px;
+  cursor: pointer;
 }
 
 main>button:hover {

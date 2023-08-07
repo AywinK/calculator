@@ -35,7 +35,7 @@ main>button:hover {
   background-color: whitesmoke;
 }
 
-#display {
+#displayArea {
   grid-row: 1 /2;
   grid-column: 1/ -1;
   text-align: right;

@@ -4,24 +4,28 @@ import { useReducer, useEffect } from "react";
 const evaluate = (state) => {
   let calculation;
 
-  if (!!state.prevOp) {
-    switch (state.prevOp) {
+  if (!!state.currentOp) {
+    switch (state.currentOp) {
       case "ADD":
-        calculation = state.value + parseFloat(state.current);
+        calculation = parseFloat(state.value) + parseFloat(state.current);
+        break;
       case "SUBTRACT":
-        calculation = state.value - parseFloat(state.current);
+        calculation = parseFloat(state.value) - parseFloat(state.current);
+        break;
       case "MULTIPLY":
-        calculation = state.value * parseFloat(state.current);
+        calculation = parseFloat(state.value) * parseFloat(state.current);
+        break;
       case "DIVIDE":
-        calculation = state.value / parseFloat(state.current);
+        calculation = parseFloat(state.value) / parseFloat(state.current);
+        break;
       default:
         calculation = "";
     }
-  }
+  } else return state
   state.prevOp = state.currentOp;
-  state.currentOp = null;
+  state.currentOp = "";
   state.value = calculation;
-  state.current = "";
+  console.log("Line29", state)
   return { ...state }
 }
 
@@ -35,18 +39,19 @@ const reducer = (state, action) => {
     case "APPEND":
       const regex = /^0(?!.)/;
       const containsMoreThanOneZeroAtStart = regex.test(state.current);
-      console.log(containsMoreThanOneZeroAtStart)
+      console.log(containsMoreThanOneZeroAtStart);
+      if (state.currentOp) return evaluate(state);
       if (!!containsMoreThanOneZeroAtStart) return ({ ...state, current: state.current.concat(action.value).slice(1) });
       console.log("here");
       return ({ ...state, current: state.current.concat(action.value) });
     case "ADD":
-      return ({ value: state.value += parseFloat(state.current), current: "0" });
+      return { ...state, currentOp: "ADD", prevVal: state.current, current: "0" };
     case "SUBTRACT":
-      return ({ value: state.value -= parseFloat(state.current), current: "0" });
+      return { ...state, currentOp: "SUBTRACT" };
     case "MULTIPLY":
-      return ({ value: state.value *= parseFloat(state.current), current: "0" });
+      return { ...state, currentOp: "MULTIPLY" };
     case "DIVIDE":
-      return ({ value: state.value /= parseFloat(state.current), current: "0" });
+      return { ...state, currentOp: "DIVIDE" };
     default:
       return state;
   }

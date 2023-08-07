@@ -1,5 +1,5 @@
 import './App.css';
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -16,13 +16,13 @@ const reducer = (state, action) => {
       console.log("here");
       return ({ ...state, current: state.current.concat(action.value) });
     case "ADD":
-      return ({ ...state, value: state.value += parseFloat(action.value) });
+      return ({ value: state.value += parseFloat(state.current), current: "0" });
     case "SUBTRACT":
-      return ({ ...state, value: state.value -= parseFloat(action.value) });
+      return ({ value: state.value -= parseFloat(state.current), current: "0" });
     case "MULTIPLY":
-      return ({ ...state, value: state.value *= parseFloat(action.value) });
+      return ({ value: state.value *= parseFloat(state.current), current: "0" });
     case "DIVIDE":
-      return ({ ...state, value: state.value /= parseFloat(action.value) });
+      return ({ value: state.value /= parseFloat(state.current), current: "0" });
     default:
       return state;
   }
@@ -32,8 +32,7 @@ function App() {
 
   const [state, dispatch] = useReducer(reducer, { value: 0, current: "0" });
 
-  console.log(state);
-
+  useEffect(() => { console.log(state); })
 
   return (
     <main>
@@ -76,7 +75,11 @@ function App() {
       <button onClick={e => {
         dispatch({ type: "APPEND", value: e.target.value })
       }} value={0} id="zero">0</button>
-      <button id="add">+</button>
+      <button
+        onClick={() => {
+          dispatch({ type: "ADD" })
+        }}
+        id="add">+</button>
       <button id="subtract">-</button>
       <button id="multiply">*</button>
       <button id="divide">/</button>

@@ -1,6 +1,30 @@
 import './App.css';
 import { useReducer, useEffect } from "react";
 
+const evaluate = (state) => {
+  let calculation;
+
+  if (!!state.prevOp) {
+    switch (state.prevOp) {
+      case "ADD":
+        calculation = state.value + parseFloat(state.current);
+      case "SUBTRACT":
+        calculation = state.value - parseFloat(state.current);
+      case "MULTIPLY":
+        calculation = state.value * parseFloat(state.current);
+      case "DIVIDE":
+        calculation = state.value / parseFloat(state.current);
+      default:
+        calculation = "";
+    }
+  }
+  state.prevOp = state.currentOp;
+  state.currentOp = null;
+  state.value = calculation;
+  state.current = "";
+  return { ...state }
+}
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "CLEAR":

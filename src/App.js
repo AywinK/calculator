@@ -3,28 +3,30 @@ import { useReducer, useEffect } from "react";
 
 const evaluate = (state) => {
   let calculation;
+  state.value = state.prevVal;
 
-  if (!!state.currentOp) {
-    switch (state.currentOp) {
+  if (!!state.prevOp) {
+    switch (state.prevOp) {
       case "ADD":
-        calculation = parseFloat(state.value) + parseFloat(state.current);
+        calculation = parseFloat(state.value) + parseFloat(state.prevVal);
         break;
       case "SUBTRACT":
-        calculation = parseFloat(state.value) - parseFloat(state.current);
+        calculation = parseFloat(state.value) - parseFloat(state.prevVal);
         break;
       case "MULTIPLY":
-        calculation = parseFloat(state.value) * parseFloat(state.current);
+        calculation = parseFloat(state.value) * parseFloat(state.prevVal);
         break;
       case "DIVIDE":
-        calculation = parseFloat(state.value) / parseFloat(state.current);
+        calculation = parseFloat(state.value) / parseFloat(state.prevVal);
         break;
       default:
         calculation = "";
     }
-  } else return state
+  }
   state.prevOp = state.currentOp;
+  state.value = calculation || state.prevVal;
   state.currentOp = "";
-  state.value = calculation;
+  state.prevVal = calculation || state.prevVal;
   console.log("Line29", state)
   return { ...state }
 }
@@ -40,10 +42,13 @@ const reducer = (state, action) => {
       const regex = /^0(?!.)/;
       const containsMoreThanOneZeroAtStart = regex.test(state.current);
       console.log(containsMoreThanOneZeroAtStart);
-      if (state.currentOp) return evaluate(state);
+      if (state.currentOp) {
+        return evaluate(state);
+      }
       if (!!containsMoreThanOneZeroAtStart) return ({ ...state, current: state.current.concat(action.value).slice(1) });
       console.log("here");
       return ({ ...state, current: state.current.concat(action.value) });
+
     case "ADD":
       return { ...state, currentOp: "ADD", prevVal: state.current, current: "0" };
     case "SUBTRACT":

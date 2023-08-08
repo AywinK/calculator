@@ -1,6 +1,37 @@
 import './App.css';
 import { useReducer, useEffect } from "react";
 
+const pressOperation = (state, currentOp) => {
+  let calculation;
+  if (!!state.prevVal) {
+    switch (state.prevOp) {
+      case "ADD":
+        calculation = parseFloat(state.prevVal) + parseFloat(state.current);
+        break;
+      case "SUBTRACT":
+        calculation = parseFloat(state.prevVal) - parseFloat(state.current);
+        break;
+      case "MULTIPLY":
+        calculation = parseFloat(state.prevVal) * parseFloat(state.current);
+        break;
+      case "DIVIDE":
+        calculation = parseFloat(state.prevVal) / parseFloat(state.current);
+        break;
+      default:
+        calculation = state.value;
+    }
+
+    const updatedState = { ...state, value: calculation, prevOp: "", currentOp: currentOp, prevVal: calculation, current: "0" }
+    return updatedState;
+  }
+
+  return { ...state, currentOp: currentOp, prevVal: state.current, current: "0" };
+}
+
+const pressNumber = (state) => {
+  return { ...state, prevOp: state.currentOp }
+}
+
 const evaluate = (state) => {
   let calculation = parseFloat(state.prevVal);
   state.value = state.prevVal;
@@ -39,21 +70,19 @@ const reducer = (state, action) => {
     case "CLEAR":
       return ({ value: 0, current: "0" });
     case "APPENDDECIMAL":
-      if (!!!state.current.includes(".")) return ({ ...state, current: state.current.concat(action.value) })
+      if (!!!state.current.includes(".")) return pressNumber({ ...state, current: state.current.concat(action.value) })
       return state;
     case "APPEND":
       const regex = /^0(?!.)/;
       const containsMoreThanOneZeroAtStart = regex.test(state.current);
       console.log(containsMoreThanOneZeroAtStart);
-      if (state.currentOp) {
-        return evaluate(state);
-      }
-      if (!!containsMoreThanOneZeroAtStart) return ({ ...state, current: state.current.concat(action.value).slice(1) });
+      if (!!containsMoreThanOneZeroAtStart) return pressNumber({ ...state, current: state.current.concat(action.value).slice(1) });
       console.log("here");
-      return ({ ...state, current: state.current.concat(action.value) });
+      return pressNumber({ ...state, current: state.current.concat(action.value) });
 
     case "ADD":
-      return { ...state, currentOp: "ADD", prevVal: state.current, current: "0" };
+      const updatedState = pressOperation(state, "ADD");
+      return updatedState;
     case "SUBTRACT":
       return { ...state, currentOp: "SUBTRACT", prevVal: state.current, current: "0" };
     case "MULTIPLY":

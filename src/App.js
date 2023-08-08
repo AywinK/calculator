@@ -2,37 +2,40 @@ import './App.css';
 import { useReducer, useEffect } from "react";
 
 const evaluate = (state) => {
-  let calculation;
+  let calculation = parseFloat(state.prevVal);
   state.value = state.prevVal;
 
   if (!!state.prevOp) {
     switch (state.prevOp) {
       case "ADD":
-        calculation = parseFloat(state.value) + parseFloat(state.prevVal);
+        calculation = parseFloat(state.current) + parseFloat(state.prevVal);
         break;
       case "SUBTRACT":
-        calculation = parseFloat(state.value) - parseFloat(state.prevVal);
+        calculation = parseFloat(state.current) - parseFloat(state.prevVal);
         break;
       case "MULTIPLY":
-        calculation = parseFloat(state.value) * parseFloat(state.prevVal);
+        calculation = parseFloat(state.current) * parseFloat(state.prevVal);
         break;
       case "DIVIDE":
-        calculation = parseFloat(state.value) / parseFloat(state.prevVal);
+        calculation = parseFloat(state.current) / parseFloat(state.prevVal);
         break;
       default:
         calculation = "";
     }
   }
   state.prevOp = state.currentOp;
-  state.value = calculation || state.prevVal;
+  state.value = calculation || parseFloat(state.prevVal);
   state.currentOp = "";
-  state.prevVal = calculation || state.prevVal;
+  state.prevVal = calculation || parseFloat(state.prevVal);
   console.log("Line29", state)
   return { ...state }
 }
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case "EVALUATE":
+      const finalState = evaluate(state);
+      return ({ ...finalState, current: finalState.value })
     case "CLEAR":
       return ({ value: 0, current: "0" });
     case "APPENDDECIMAL":
@@ -52,11 +55,11 @@ const reducer = (state, action) => {
     case "ADD":
       return { ...state, currentOp: "ADD", prevVal: state.current, current: "0" };
     case "SUBTRACT":
-      return { ...state, currentOp: "SUBTRACT" };
+      return { ...state, currentOp: "SUBTRACT", prevVal: state.current, current: "0" };
     case "MULTIPLY":
-      return { ...state, currentOp: "MULTIPLY" };
+      return { ...state, currentOp: "MULTIPLY", prevVal: state.current, current: "0" };
     case "DIVIDE":
-      return { ...state, currentOp: "DIVIDE" };
+      return { ...state, currentOp: "DIVIDE", prevVal: state.current, current: "0" };
     default:
       return state;
   }
@@ -78,7 +81,11 @@ function App() {
       <button
         onClick={() => dispatch({ type: "CLEAR" })}
         id="clear">clear</button>
-      <button id="equals">=</button>
+      <button
+        onClick={() => {
+          dispatch({ type: "EVALUATE" })
+        }}
+        id="equals">=</button>
       <button onClick={e => {
         dispatch({ type: "APPEND", value: e.target.value })
       }} value={9} id="nine">9</button>
@@ -114,9 +121,21 @@ function App() {
           dispatch({ type: "ADD" })
         }}
         id="add">+</button>
-      <button id="subtract">-</button>
-      <button id="multiply">*</button>
-      <button id="divide">/</button>
+      <button
+        onClick={() => {
+          dispatch({ type: "SUBTRACT" })
+        }}
+        id="subtract">-</button>
+      <button
+        onClick={() => {
+          dispatch({ type: "MULTIPLY" })
+        }}
+        id="multiply">*</button>
+      <button
+        onClick={() => {
+          dispatch({ type: "DIVIDE" })
+        }}
+        id="divide">/</button>
       <button
         onClick={e => {
           dispatch({ type: "APPENDDECIMAL", value: e.target.value })

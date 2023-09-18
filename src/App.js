@@ -28,6 +28,41 @@ const handleOpPress = (state, currentOp) => {
   return { ...state, currentOp: currentOp, prevVal: state.current, current: "0" };
 }
 
+const handleEvaluate = (state) => {
+  const finalState = {
+    prevVal: null,
+    prevOp: null,
+    currentOp: null
+  };
+
+  let val = parseFloat(state.prevVal);
+
+  if (state.prevVal) {
+    switch (state.prevOp) {
+      case "ADD":
+        val += parseFloat(state.current);
+        break;
+      case "SUBTRACT":
+        val -= parseFloat(state.current);
+        break;
+      case "MULTIPLY":
+        val *= parseFloat(state.current);
+        break;
+      case "DIVIDE":
+        val /= parseFloat(state.current);
+        break;
+      default:
+        console.log("no valid prevOp, returning state");
+        return state;
+    }
+  }
+
+  finalState.current = val;
+  finalState.value = val;
+  return finalState
+
+}
+
 const pressNumber = (state) => {
   return { ...state, prevOp: state.currentOp }
 }
@@ -35,7 +70,7 @@ const pressNumber = (state) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case "EVALUATE":
-      const finalState = pressNumber(state);
+      const finalState = handleEvaluate(state);
       return ({ ...finalState, current: finalState.current });
     case "CLEAR":
       return ({ value: 0, current: "0" });

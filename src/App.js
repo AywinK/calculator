@@ -1,21 +1,21 @@
 import './App.css';
 import { useReducer, useEffect } from "react";
 
-const pressOperation = (state, currentOp) => {
-  let calculation;
-  if (!!state.prevVal) {
+const handleOpPress = (state, currentOp) => {
+  let calculation = state.prevVal;
+  if (state.prevVal) {
     switch (state.prevOp) {
       case "ADD":
-        calculation = parseFloat(state.prevVal) + parseFloat(state.current);
+        calculation += parseFloat(state.current);
         break;
       case "SUBTRACT":
-        calculation = parseFloat(state.prevVal) - parseFloat(state.current);
+        calculation -= parseFloat(state.current);
         break;
       case "MULTIPLY":
-        calculation = parseFloat(state.prevVal) * parseFloat(state.current);
+        calculation *= parseFloat(state.current);
         break;
       case "DIVIDE":
-        calculation = parseFloat(state.prevVal) / parseFloat(state.current);
+        calculation /= parseFloat(state.current);
         break;
       default:
         calculation = state.value;
@@ -32,41 +32,11 @@ const pressNumber = (state) => {
   return { ...state, prevOp: state.currentOp }
 }
 
-const evaluate = (state) => {
-  let calculation = parseFloat(state.prevVal);
-  state.value = state.prevVal;
-
-  if (!!state.prevOp) {
-    switch (state.prevOp) {
-      case "ADD":
-        calculation = parseFloat(state.current) + parseFloat(state.prevVal);
-        break;
-      case "SUBTRACT":
-        calculation = parseFloat(state.current) - parseFloat(state.prevVal);
-        break;
-      case "MULTIPLY":
-        calculation = parseFloat(state.current) * parseFloat(state.prevVal);
-        break;
-      case "DIVIDE":
-        calculation = parseFloat(state.current) / parseFloat(state.prevVal);
-        break;
-      default:
-        calculation = "";
-    }
-  }
-  state.prevOp = state.currentOp;
-  state.value = calculation || parseFloat(state.prevVal);
-  state.currentOp = "";
-  state.prevVal = calculation || parseFloat(state.prevVal);
-  console.log("Line29", state)
-  return { ...state }
-}
-
 const reducer = (state, action) => {
   switch (action.type) {
     case "EVALUATE":
-      const finalState = evaluate(state);
-      return ({ ...finalState, current: finalState.value })
+      const finalState = pressNumber(state, state.prevOp);
+      return ({ ...finalState, current: finalState.current });
     case "CLEAR":
       return ({ value: 0, current: "0" });
     case "APPENDDECIMAL":
@@ -81,14 +51,13 @@ const reducer = (state, action) => {
       return pressNumber({ ...state, current: state.current.concat(action.value) });
 
     case "ADD":
-      const updatedState = pressOperation(state, "ADD");
-      return updatedState;
+      return handleOpPress(state, "ADD");
     case "SUBTRACT":
-      return { ...state, currentOp: "SUBTRACT", prevVal: state.current, current: "0" };
+      return handleOpPress(state, "SUBTRACT");
     case "MULTIPLY":
-      return { ...state, currentOp: "MULTIPLY", prevVal: state.current, current: "0" };
+      return handleOpPress(state, "MULTIPLY");
     case "DIVIDE":
-      return { ...state, currentOp: "DIVIDE", prevVal: state.current, current: "0" };
+      return handleOpPress(state, "DIVIDE");
     default:
       return state;
   }
@@ -98,7 +67,7 @@ function App() {
 
   const [state, dispatch] = useReducer(reducer, { value: 0, current: "0" });
 
-  useEffect(() => { console.log(state); })
+  useEffect(() => { console.log(state); }, [state])
 
   return (
     <main>

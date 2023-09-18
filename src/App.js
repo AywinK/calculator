@@ -2,7 +2,7 @@ import './App.css';
 import { useReducer, useEffect } from "react";
 
 const handleOpPress = (state, currentOp) => {
-  let calculation = state.prevVal;
+  let calculation = parseFloat(state.prevVal);
   if (state.prevVal) {
     switch (state.prevOp) {
       case "ADD":
@@ -35,7 +35,7 @@ const pressNumber = (state) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case "EVALUATE":
-      const finalState = pressNumber(state, state.prevOp);
+      const finalState = pressNumber(state);
       return ({ ...finalState, current: finalState.current });
     case "CLEAR":
       return ({ value: 0, current: "0" });

@@ -8,7 +8,7 @@ if (state.currentOp !== "SUBTRACT" && state.currentOp && currentOp === "SUBTRACT
 }
 
   let calculation = parseFloat(state.prevVal);
-  if (state.prevVal) {
+  if (state.prevVal && state.prevOp) {
     switch (state.prevOp) {
       case "ADD":
         calculation += parseFloat(state.current);
@@ -30,7 +30,7 @@ if (state.currentOp !== "SUBTRACT" && state.currentOp && currentOp === "SUBTRACT
     return updatedState;
   }
 
-  return { ...state, currentOp: currentOp, prevVal: state.current, current: "0" };
+  return { ...state, currentOp: currentOp, prevVal: state.prevVal ||state.current, current: "0" };
 }
 
 const handleEvaluate = (state) => {

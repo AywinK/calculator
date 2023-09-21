@@ -2,8 +2,13 @@ import './App.css';
 import { useReducer, useEffect } from "react";
 
 const handleOpPress = (state, currentOp) => {
+
+if (state.currentOp !== "SUBTRACT" && state.currentOp && currentOp === "SUBTRACT" && state.currentOp !== state.prevOp) {
+  return {...state, currentIsNegative: true, current: `-${state.current}`}
+}
+
   let calculation = parseFloat(state.prevVal);
-  if (state.prevVal) {
+  if (state.prevVal && state.prevOp) {
     switch (state.prevOp) {
       case "ADD":
         calculation += parseFloat(state.current);
@@ -21,11 +26,11 @@ const handleOpPress = (state, currentOp) => {
         calculation = state.value;
     }
 
-    const updatedState = { ...state, value: calculation, prevOp: "", currentOp: currentOp, prevVal: calculation, current: "0" }
+    const updatedState = { ...state, value: calculation, prevOp: "", currentOp: currentOp, prevVal: calculation, current: "0", currentIsNegative: false }
     return updatedState;
   }
 
-  return { ...state, currentOp: currentOp, prevVal: state.current, current: "0" };
+  return { ...state, currentOp: currentOp, prevVal: state.prevVal ||state.current, current: "0" };
 }
 
 const handleEvaluate = (state) => {
